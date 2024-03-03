@@ -39,11 +39,12 @@ const root = {
 */
 
 import { GraphQLList } from "graphql";
-import { UserType } from "../Types/User.js";
+import { AccountType } from "../Types/Account.js";
+import { Accounts } from "../../entities/Accounts.js";
 
 export const GET_ALL_USERS = {
-  type: new GraphQLList(UserType),
+  type: new GraphQLList(AccountType),
   resolve() {
-    return ["Deniz"];
+    return Accounts.find();
   }
 } 

@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLID, GraphQLString } from 'graphql'
 
-export const UserType = new GraphQLObjectType({
-  name: "User",
+export const AccountType = new GraphQLObjectType({
+  name: "Account",
   fields: () => ({
     id: { type: GraphQLID},
     username: { type: GraphQLString },

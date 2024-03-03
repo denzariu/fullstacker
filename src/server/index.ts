@@ -6,7 +6,7 @@ import { graphqlHTTP } from 'express-graphql';
 // import { buildASTSchema } from 'graphql';
 
 import { schema } from './schema/index.ts'
-import { Accounts } from './entities/Users.ts';
+import { Accounts } from './entities/Accounts.ts';
 import { DataSource } from 'typeorm';
 
 
@@ -16,13 +16,18 @@ export const dataSource = new DataSource({
   username: "root",
   password: "",
   logging: true,
-  synchronize: true,
+  synchronize: false,
+  
   entities: [Accounts],
 
   // connectTimeout: 60000,
 });
+dataSource.initialize()
+
+
 
 const app = express();
+
 
 app.use(express.json())
 app.use(cors());
