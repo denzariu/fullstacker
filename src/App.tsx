@@ -1,13 +1,21 @@
-import { useState } from 'react'
 import './App.css'
-import Posts from './components/Posts'
+import Accounts from './client/components/Accounts';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+
+
 
 function App() {
 
+  const client = new ApolloClient({
+    uri: "http://localhost:4000/graphql",
+    cache: new InMemoryCache(),
+  });
+
   return (
-    <>
-      <Posts/>
-    </>
+    
+    <ApolloProvider client={client}>
+      <Accounts/>
+    </ApolloProvider>
   )
 }
 

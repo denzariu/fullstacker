@@ -42,7 +42,7 @@ import { GraphQLList } from "graphql";
 import { AccountType } from "../Types/Account.js";
 import { Accounts } from "../../entities/Accounts.js";
 
-export const GET_ALL_USERS = {
+export const GET_ALL_ACCOUNTS = {
   type: new GraphQLList(AccountType),
   resolve() {
     return Accounts.find();
