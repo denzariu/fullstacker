@@ -14,9 +14,15 @@ function Accounts(): ReactElement {
 
 
   return (
-    <div className='bg-red-300 h-20 w-20'>
+    <div className="bg-fuchsia-50">
+      <div className="text-xl">All Accounts</div>
       {data && data.getAllAccounts.map(( account: any ) => 
-        <div key={account.__typename + account.id} className='flex bg-fuchsia-400 text-fuchsia-700'>{account.username + ' ' + account.password}</div>  
+        <div key={account.__typename + account.id}
+          className='flex gap-1'
+        >
+          <div className="bg-fuchsia-100 text-fuchsia-700">{account.username}</div>
+          <div >{account.password}</div>
+        </div>  
       )}
     </div>
 

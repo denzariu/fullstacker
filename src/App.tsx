@@ -1,6 +1,7 @@
 import './App.css'
 import Accounts from './client/components/Accounts';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import LogIn from './client/components/LogIn';
 
 
 
@@ -15,6 +16,7 @@ function App() {
     
     <ApolloProvider client={client}>
       <Accounts/>
+      <LogIn/>
     </ApolloProvider>
   )
 }
