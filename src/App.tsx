@@ -15,7 +15,7 @@ function App() {
   return (
     
     <ApolloProvider client={client}>
-      <Accounts/>
+      {/* <Accounts/> */}
       <LogIn/>
     </ApolloProvider>
   )
