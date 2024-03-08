@@ -18,7 +18,7 @@ const LogInSchema = object().shape({
     .required('*'),
 });
 
-function LogIn(): ReactElement {
+function SignUp(): ReactElement {
   
   //@ts-ignore
   const [userExists, {loading, error, data}] = useLazyQuery(
@@ -95,7 +95,7 @@ function LogIn(): ReactElement {
 
           <Logo className='h-12 w-12 fill-lime-600 self-center sm:self-start '/>
           <h1 className="text-2xl sm:text-4xl text-lime-600 self-center sm:self-start flex-1 flex items-center font-medium leading-10">
-            Log In
+            Sign Up
           </h1>
           
           {/* Warning - Dev Only */}
@@ -108,6 +108,8 @@ function LogIn(): ReactElement {
           enableReinitialize
           validationSchema={LogInSchema}
           initialValues={{
+            first_name: profile ? profile.first_name : '',
+            last_name: profile ? profile.last_name: '', 
             email: profile ? profile.email : '',
             password: '',
           }}
@@ -136,8 +138,50 @@ function LogIn(): ReactElement {
                 <p className='relative bottom-[-1.6rem] px-4 bg-lime-200 text-lime-600 font-normal text-sm tracking-tighter pt-4 '>or login with</p>
               </div>
 
-              {/* Email */}
+              {/* First Name */}
               <div className='sm:border-t-2 sm:border-lime-500 sm:pt-12'>
+                <span className='flex items-center justify-between'>
+                  <label 
+                    className="block text-sm font-medium leading-6 text-lime-600"
+                    htmlFor="firstName"
+                  >
+                    First Name
+                  </label>
+                  {errors.first_name && touched.first_name ? 
+                    <div className='self-end text-red-500 font-medium'>{errors.first_name}</div>
+                  : null}
+                  </span>
+                <Field 
+                  id="firstName" 
+                  name="firstName" 
+                  placeholder="Frog"
+                  className="w-full p-2 text-green-600 bg-lime-50 rounded-md shadow-sm ring-1 ring-inset ring-lime-200 focus-within:ring-2 focus-within:ring-inset focus-within:ring-lime-400"
+                />
+              </div>
+
+              {/* Last Name */}
+              <div className=''>
+                <span className='flex items-center justify-between'>
+                  <label 
+                    className="block text-sm font-medium leading-6 text-lime-600"
+                    htmlFor="lastName"
+                  >
+                    Last Name
+                  </label>
+                  {errors.last_name && touched.last_name ? 
+                    <div className='self-end text-red-500 font-medium'>{errors.last_name}</div>
+                  : null}
+                  </span>
+                <Field 
+                  id="lastName" 
+                  name="lastName" 
+                  placeholder="McFrog"
+                  className="w-full p-2 text-green-600 bg-lime-50 rounded-md shadow-sm ring-1 ring-inset ring-lime-200 focus-within:ring-2 focus-within:ring-inset focus-within:ring-lime-400"
+                />
+              </div>
+
+              {/* Email */}
+              <div className=''>
                 <span className='flex items-center justify-between'>
                   <label 
                     className="block text-sm font-medium leading-6 text-lime-600"
@@ -185,7 +229,7 @@ function LogIn(): ReactElement {
                   className='py-[0.15rem] flex-1 px-3 rounded-xl text-lg bg-lime-500 text-lime-50
                           transition-colors duration-150 hover:bg-lime-50 hover:text-lime-500'
                 >
-                  Log In
+                  Sign Up
                 </button>
                 <GoogleLogin 
                   shape='circle'
@@ -203,12 +247,12 @@ function LogIn(): ReactElement {
               </span>
               
               <div className='flex-[0.8] flex-col flex justify-end self-end'>
-                <p className='text-sm text-lime-600 font-light'>Don't have an account?</p>
+                <p className='text-sm text-lime-600 font-light'>Already have an account?</p>
                 <Link 
-                    to='/signup'
+                    to='/login'
                     className=' text-lime-600 mt-1 self-end text-base transition-colors duration-150 hover:text-lime-500'
                 >
-                  Sign Up
+                  Log In
                 </Link>
               </div>
             </Form>
@@ -222,4 +266,4 @@ function LogIn(): ReactElement {
   )
 }
 
-export default LogIn 
+export default SignUp 

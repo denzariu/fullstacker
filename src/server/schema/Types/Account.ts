@@ -6,5 +6,6 @@ export const AccountType = new GraphQLObjectType({
     id: { type: GraphQLID},
     username: { type: GraphQLString },
     password: { type: GraphQLString },
+    email: { type: GraphQLString }
   })
 })

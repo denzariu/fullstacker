@@ -38,7 +38,7 @@ const root = {
 
 */
 
-import { GraphQLList } from "graphql";
+import { GraphQLBoolean, GraphQLList, GraphQLString } from "graphql";
 import { AccountType } from "../Types/Account.js";
 import { Accounts } from "../../entities/Accounts.js";
 
@@ -46,5 +46,42 @@ export const GET_ALL_ACCOUNTS = {
   type: new GraphQLList(AccountType),
   resolve() {
     return Accounts.find();
+  }
+} 
+
+export const ACCOUNT_EXISTS = {
+  type: GraphQLBoolean,
+  args: {
+    email: { type: GraphQLString },
+    password: { type: GraphQLString }
+  },
+  async resolve(parent: any, args: any) {
+    console.log(parent)
+
+    const { email, password } = args
+    const user = await Accounts.findOneBy({email: email, password: password})
+
+    if (user)
+      return true
+
+    return false
+  }
+} 
+
+export const MAIL_EXISTS = {
+  type: GraphQLBoolean,
+  args: {
+    email: { type: GraphQLString },
+  },
+  async resolve(parent: any, args: any) {
+    console.log(parent)
+
+    const { email } = args
+    const user = await Accounts.findOneBy({email: email})
+
+    if (user)
+      return true
+
+    return false
   }
 } 

@@ -8,9 +8,12 @@ export class Accounts extends BaseEntity {
   id!: number;
 
   @Column()
-  username!: string;
+  username?: string;
 
   @Column()
   password!: string;
+
+  @Column()
+  email!: string;
 
 }
