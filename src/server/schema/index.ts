@@ -1,11 +1,12 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
-import { ACCOUNT_EXISTS, GET_ALL_ACCOUNTS, MAIL_EXISTS } from './Queries/Account.ts' 
+import { ACCOUNT_EXISTS, CAN_LOGIN, GET_ALL_ACCOUNTS, MAIL_EXISTS } from './Queries/Account.ts' 
 import { CREATE_ACCOUNT, DELETE_ACCOUNT, UPDATE_PASSWORD } from "./Mutations/Account.ts";
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQuery",
   fields: {
     getAllAccounts: GET_ALL_ACCOUNTS,
+    canLogIn: CAN_LOGIN,
     accountExists: ACCOUNT_EXISTS,
     mailExists: MAIL_EXISTS 
   }

@@ -29,3 +29,18 @@ export const MAIL_EXISTS = gql`
       mailExists(email: $email)
     }
 `
+
+export const CAN_LOGIN = gql`
+  query
+    canLogIn(
+      $email: String!,
+      $password: String!,
+      $google_auth: String!
+    ) {
+      mailExists(
+        email: $email
+        password: $password,
+        google_auth: $google_auth
+      )
+    }
+`

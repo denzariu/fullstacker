@@ -11,10 +11,11 @@ import { Link, useRoute } from 'wouter'
 import Logo from './Logo'
 
 const LogInSchema = object().shape({
+  first_name: string().min(2, 'Too Short!').max(48, 'Too Long!'),
   email: string().email('Invalid email').required('*'),
   password: string()
     .min(2, 'Too Short!')
-    .max(50, 'Too Long!')
+    .max(48, 'Too Long!')
     .required('*'),
 });
 
@@ -76,7 +77,6 @@ function SignUp(): ReactElement {
 
 
   const onFormSubmit = async (values: any) => {
-    //
     const accountExists = await checkAccount(values.email, values.password)
 
     if (accountExists.data.accountExists) 
@@ -90,7 +90,7 @@ function SignUp(): ReactElement {
   return (
     <div className="flex h-screen bg-lime-100  tracking-tight align-middle items-center justify-center" 
     >
-      <div className='flex-1 flex flex-col sm:flex-row mx-8 lg:mx-52 min-h-[30%] sm:min-h-[50%] sm:max-w-7xl justify-between border-2 border-lime-200 bg-lime-50 rounded-lg gap-x-4 p-4'>
+      <div className='flex-1 flex flex-col sm:flex-row mx-8 lg:mx-52 sm:max-w-7xl justify-between border-2 border-lime-200 bg-lime-50 rounded-lg gap-x-4 p-4'>
         <div className='sm:flex-2 flex flex-col sm:flex-row sm:space-x-2'>
 
           <Logo className='h-12 w-12 fill-lime-600 self-center sm:self-start '/>
@@ -108,8 +108,8 @@ function SignUp(): ReactElement {
           enableReinitialize
           validationSchema={LogInSchema}
           initialValues={{
-            first_name: profile ? profile.first_name : '',
-            last_name: profile ? profile.last_name: '', 
+            first_name: profile ? profile.given_name : '',
+            last_name: profile ? profile.family_name: '', 
             email: profile ? profile.email : '',
             password: '',
           }}
@@ -120,7 +120,7 @@ function SignUp(): ReactElement {
         >
           {({ errors, touched }) => (
             
-            <Form className='flex flex-1 flex-col sm:min-w-64 sm:border-r-2 sm:border-b-2 border-lime-500 sm:bg-lime-200 sm:p-8 lg:p-20 rounded-lg gap-y-2 sm:gap-y-4 justify-center'>
+            <Form className='flex flex-1 flex-col sm:min-w-64 sm:border-r-2 sm:border-b-2 border-lime-500 sm:bg-lime-200 sm:p-8 lg:p-12 rounded-lg gap-y-2 sm:gap-y-4 justify-center'>
               
               <div className='hidden sm:flex sm:flex-col items-center self-center'>
                 <GoogleLogin 
@@ -135,7 +135,9 @@ function SignUp(): ReactElement {
                   ux_mode='popup' //redirect?
                   onError={handleErrorResponse} 
                 />
-                <p className='relative bottom-[-1.6rem] px-4 bg-lime-200 text-lime-600 font-normal text-sm tracking-tighter pt-4 '>or login with</p>
+                <p className='relative bottom-[-1.6rem] px-4 bg-lime-200 text-lime-600 font-normal text-sm tracking-tighter pt-4 '>
+                  or sign up with
+                </p>
               </div>
 
               {/* First Name */}
@@ -143,7 +145,7 @@ function SignUp(): ReactElement {
                 <span className='flex items-center justify-between'>
                   <label 
                     className="block text-sm font-medium leading-6 text-lime-600"
-                    htmlFor="firstName"
+                    htmlFor="first_name"
                   >
                     First Name
                   </label>
@@ -152,8 +154,8 @@ function SignUp(): ReactElement {
                   : null}
                   </span>
                 <Field 
-                  id="firstName" 
-                  name="firstName" 
+                  id="first_name" 
+                  name="first_name" 
                   placeholder="Frog"
                   className="w-full p-2 text-green-600 bg-lime-50 rounded-md shadow-sm ring-1 ring-inset ring-lime-200 focus-within:ring-2 focus-within:ring-inset focus-within:ring-lime-400"
                 />
@@ -164,7 +166,7 @@ function SignUp(): ReactElement {
                 <span className='flex items-center justify-between'>
                   <label 
                     className="block text-sm font-medium leading-6 text-lime-600"
-                    htmlFor="lastName"
+                    htmlFor="last_name"
                   >
                     Last Name
                   </label>
@@ -173,8 +175,8 @@ function SignUp(): ReactElement {
                   : null}
                   </span>
                 <Field 
-                  id="lastName" 
-                  name="lastName" 
+                  id="last_name" 
+                  name="last_name" 
                   placeholder="McFrog"
                   className="w-full p-2 text-green-600 bg-lime-50 rounded-md shadow-sm ring-1 ring-inset ring-lime-200 focus-within:ring-2 focus-within:ring-inset focus-within:ring-lime-400"
                 />

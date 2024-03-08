@@ -1,5 +1,5 @@
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { GET_ALL_ACCOUNTS, ACCOUNT_EXISTS, MAIL_EXISTS } from '../GraphQL/Queries'
+import { GET_ALL_ACCOUNTS, ACCOUNT_EXISTS, MAIL_EXISTS, CAN_LOGIN } from '../GraphQL/Queries'
 import { gql, useLazyQuery, useQuery } from '@apollo/client'
 import { Field, Form, Formik } from 'formik'
 import { GoogleCredentialResponse, GoogleLogin } from '@react-oauth/google'
@@ -20,68 +20,68 @@ const LogInSchema = object().shape({
 
 function LogIn(): ReactElement {
   
+    
   //@ts-ignore
-  const [userExists, {loading, error, data}] = useLazyQuery(
-    ACCOUNT_EXISTS, 
-    { variables: { email: "", password: "" }})
-
-  //@ts-ignore
-  const [mailExists, {loadingMailExists, errorMailExists, dataMailExists}] = useLazyQuery(
-    MAIL_EXISTS, 
-    { variables: { email: "" }})
+  const [canLogIn, {loading, error, data}] = useLazyQuery(
+    CAN_LOGIN, 
+    { variables: { email: "", password: "", google_auth: "" }})
 
   const [ popup, setPopup ] = useState<string>('');
-  const [ credential, setCredential ] = useState<any>(undefined);
+  // const [ credential, setCredential ] = useState<any>(undefined);
   const [ profile, setProfile ] = useState<any>(undefined);
   
 
   const handleResponse = (response: GoogleCredentialResponse) => {
     //Set Credentials
-    setCredential(response.credential)
+    // setCredential(response.credential)
     console.log("credential set: ", response)
+    onFormSubmit({ email: "", password: "", credential: response.credential})
     
-    
-    //Get Profile Info
-    if (response.credential) {
-      //Decode credentials
-      var profileObject = jwtDecode<JwtPayload>(response.credential)
 
-      setProfile(profileObject)
-      console.log(profileObject)
+    
+    // //Get Profile Info
+    // if (response.credential) {
+    //   //Decode credentials
+    //   var profileObject = jwtDecode<JwtPayload>(response.credential)
+
+    //   setProfile(profileObject)
+    //   console.log(profileObject)
       
-      //If user exists in the DB
-      checkAccount(profileObject.email).then(res => {
-        if (!res.data.mailExists) setPopup("User logged in but is not registered on server.")
+    //   //If user exists in the DB
+    //   checkAccount(profileObject.email).then(res => {
+    //     if (!res.data.mailExists) setPopup("User logged in but is not registered on server.")
 
-        //If credentials are ok ==> proceed
-        else if (profileObject.exp && profileObject.email_verified
-          && profileObject.exp < Date.now() 
-          && profileObject.email_verified) {
-            setPopup("User exists and logged in with Google.")
-          }
-      })
-    }
+    //     //If credentials are ok ==> proceed
+    //     else if (profileObject.exp && profileObject.email_verified
+    //       && profileObject.exp < Date.now() 
+    //       && profileObject.email_verified) {
+    //         setPopup("User exists and logged in with Google.")
+    //       }
+    //   })
+    // }
   };
 
   const handleErrorResponse = () => {
       console.log('error on auth');
   };
 
-  const checkAccount = async (email_user: string, password_user?: string) => {
-    if (!password_user)
-      return mailExists({ variables: { email: email_user }})
-    else 
-      return userExists({ variables: { email: email_user ?? "", password: password_user ?? ""}})
+  const checkAccount = async (email_user: string, password_user?: string, credential?: string) => {
+    console.log(credential)
+    if (credential)
+      return canLogIn({ variables: { email: email_user ?? undefined, password: password_user ?? undefined, google_auth: credential ?? undefined}})
   }
 
 
   const onFormSubmit = async (values: any) => {
-    //
-    const accountExists = await checkAccount(values.email, values.password)
+    console.log(values)
+    const accountExists = await checkAccount(values.email, values.password, values.credential)
+    console.log(accountExists)
 
-    if (accountExists.data.accountExists) 
+    if (accountExists && accountExists.data && accountExists.data.canLogIn) 
       setPopup("Proceed.")
-    else 
+    else if (!accountExists)
+      setPopup("Server is down.")
+    else
       setPopup("Email & password combination is incorrect.")
   }
 
@@ -118,7 +118,7 @@ function LogIn(): ReactElement {
         >
           {({ errors, touched }) => (
             
-            <Form className='flex flex-1 flex-col sm:min-w-64 sm:border-r-2 sm:border-b-2 border-lime-500 sm:bg-lime-200 sm:p-8 lg:p-20 rounded-lg gap-y-2 sm:gap-y-4 justify-center'>
+            <Form className='flex flex-1 flex-col sm:min-w-64 sm:border-r-2 sm:border-b-2 border-lime-500 sm:bg-lime-200 sm:p-8 lg:p-12 rounded-lg gap-y-2 sm:gap-y-4 justify-center'>
               
               <div className='hidden sm:flex sm:flex-col items-center self-center'>
                 <GoogleLogin 
@@ -133,7 +133,9 @@ function LogIn(): ReactElement {
                   ux_mode='popup' //redirect?
                   onError={handleErrorResponse} 
                 />
-                <p className='relative bottom-[-1.6rem] px-4 bg-lime-200 text-lime-600 font-normal text-sm tracking-tighter pt-4 '>or login with</p>
+                <p className='relative bottom-[-1.6rem] px-4 bg-lime-200 text-lime-600 font-normal text-sm tracking-tighter pt-4 '>
+                  or log in with
+                </p>
               </div>
 
               {/* Email */}

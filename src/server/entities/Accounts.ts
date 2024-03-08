@@ -16,4 +16,18 @@ export class Accounts extends BaseEntity {
   @Column()
   email!: string;
 
+  @Column()
+  first_name!: string;
+
+  @Column()
+  last_name!: string;
+
+  @Column()
+  token?: string;
+
+  @Column()
+  token_expire?: number;
+
+  @Column()
+  picture_url?: string;
 }
