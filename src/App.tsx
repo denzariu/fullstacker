@@ -1,56 +1,55 @@
 import './App.css'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import LogIn from './client/components/LogIn';
-import { Link, Route, Switch } from 'wouter'
+import { Link, Redirect, Route, Switch } from 'wouter'
 import Accounts from './client/components/Accounts';
 import SignUp from './client/components/SignUp';
-
+import NotFound from './client/components/NotFound';
+import { CookiesProvider, useCookies } from 'react-cookie'
 
 function App() {
+  const [cookies, setCookie] = useCookies(['user'])
+
 
   const client = new ApolloClient({
     uri: "http://localhost:4000/graphql",
     cache: new InMemoryCache(),
   });
 
+  function handleLogin(user: any) {
+    setCookie('user', user, { path: '/' })
+  }
+  console.log({cookies})
+
   return (
     
     <ApolloProvider client={client}>
-      <Switch>
-        <Route path="/login" component={LogIn}/>
-        <Route path="/signup" component={SignUp}/>
-        
-        <Route path="/users/:name">
-          {(params) => <>Hello, {params.name}!</>}
-        </Route>
+      <CookiesProvider>
+        <Switch>
+          
+          {cookies.user ?
+          <>
+            <Route path="/users/:name">
+              {(params) => <>Hello, {params.name}!</>}
+            </Route>
+            <Route path="/home" component={() => <p>Testing</p>}/>
 
-        <Route>404: Not Found!</Route>
+          </>
+          :
+          <>
+            
+          </>
+          }
 
-
-
+          <Route path="/" component={LogIn}/>
+          <Route path="/login" component={LogIn}/>
+          <Route path="/signup" component={SignUp}/>
+          <Route component={NotFound}/>
+          
       </Switch>
+      </CookiesProvider>
     </ApolloProvider>     
 
-// <>
-// <Link href="/users/1">Profile</Link>
-
-// <Route path="/about">About Us</Route>
-
-// {/* 
-//   Routes below are matched exclusively -
-//   the first matched route gets rendered
-// */}
-// <Switch>
-//   <Route path="/inbox" component={InboxPage} />
-
-//   <Route path="/users/:name">
-//     {(params) => <>Hello, {params.name}!</>}
-//   </Route>
-
-//   {/* Default route in a switch */}
-//   <Route>404: No such page!</Route>
-// </Switch>
-// </>
   )
 }
 

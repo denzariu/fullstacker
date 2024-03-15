@@ -37,8 +37,8 @@ export const CAN_LOGIN = gql`
       $password: String!,
       $google_auth: String!
     ) {
-      mailExists(
-        email: $email
+      canLogIn(
+        email: $email,
         password: $password,
         google_auth: $google_auth
       )

@@ -88,6 +88,11 @@ export const MAIL_EXISTS = {
   }
 } 
 
+
+  /* 
+    Log in by:  - Google sign in -> email + token check
+                - Normal user -> email + pass
+  */
 export const CAN_LOGIN = {
   type: GraphQLBoolean,
   args: {
@@ -97,12 +102,7 @@ export const CAN_LOGIN = {
     google_auth: { type: GraphQLString }
   },
   async resolve(parent: any, args: any) {
-    console.log(parent, args)
-
-    /* 
-      Log in by:  - Google sign in -> email + token check
-                  - Normal user -> email + pass
-    */
+    console.log(parent)
 
 
     if (args.google_auth) { 
@@ -110,26 +110,37 @@ export const CAN_LOGIN = {
       const user_credential = jwtDecode<JwtPayload>(args.google_auth)
       const user_fetch = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${args.google_auth}`)
       
+      // console.log('Fetched user: ', user_fetch, " CREDENTIALS: ", user_credential)
 
       // If error ==> deny
       //@ts-ignore
       if (!user_fetch.ok || user_fetch.error === "invalid_token") return false;
+
+      // console.log('Fetching was ok. Checking exp... ')
+
       
       // If token is expired ==> deny
       //@ts-ignore
       if (user_fetch.exp < Date.now()) return false;
       
+
       // Search for user in DB
       //@ts-ignore
       const user = await Accounts.findOneBy({ email: user_credential.email })
-      
+
+      // console.log('Expiration date is ok. Checking if user exists in DB...', user)
+
       // if no user was found, it needs to be added
       if (!user) return false
 
+      // console.log('User exists in DB. Testing if credential exists: ', !user_credential.exp, " and if its exp <= now ", user_credential.exp, ' < ', Date.now() / 1000)
+
+
       // if user logged in with a token, check valability
-      if (user_credential.exp && user_credential.exp > Date.now()) return false
+      if (!user_credential.exp || user_credential.exp <= Date.now() / 1000) return false
       else {
-        //TODO: update user with new exp
+        // console.log('CAN LOG IN! ')
+
         return true
       }
     } else {

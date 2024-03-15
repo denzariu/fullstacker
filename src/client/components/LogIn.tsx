@@ -6,9 +6,10 @@ import { GoogleCredentialResponse, GoogleLogin } from '@react-oauth/google'
 
 import { JwtPayload, jwtDecode } from 'jwt-decode'
 import { object, string } from 'yup'
-import { Link, useRoute } from 'wouter'
+import { Link, useLocation, useRoute } from 'wouter'
 
 import Logo from './Logo'
+import { useCookies } from 'react-cookie'
 
 const LogInSchema = object().shape({
   email: string().email('Invalid email').required('*'),
@@ -19,66 +20,44 @@ const LogInSchema = object().shape({
 });
 
 function LogIn(): ReactElement {
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const [location, setLocation] = useLocation();
   
-    
   //@ts-ignore
   const [canLogIn, {loading, error, data}] = useLazyQuery(
     CAN_LOGIN, 
-    { variables: { email: "", password: "", google_auth: "" }})
-
+    { variables: { email: "", password: "", google_auth: "" }}
+  )
+  
   const [ popup, setPopup ] = useState<string>('');
-  // const [ credential, setCredential ] = useState<any>(undefined);
-  const [ profile, setProfile ] = useState<any>(undefined);
   
 
+  // Google OATH => Positive Response
   const handleResponse = (response: GoogleCredentialResponse) => {
-    //Set Credentials
-    // setCredential(response.credential)
-    console.log("credential set: ", response)
+    //@ts-ignore
     onFormSubmit({ email: "", password: "", credential: response.credential})
-    
-
-    
-    // //Get Profile Info
-    // if (response.credential) {
-    //   //Decode credentials
-    //   var profileObject = jwtDecode<JwtPayload>(response.credential)
-
-    //   setProfile(profileObject)
-    //   console.log(profileObject)
-      
-    //   //If user exists in the DB
-    //   checkAccount(profileObject.email).then(res => {
-    //     if (!res.data.mailExists) setPopup("User logged in but is not registered on server.")
-
-    //     //If credentials are ok ==> proceed
-    //     else if (profileObject.exp && profileObject.email_verified
-    //       && profileObject.exp < Date.now() 
-    //       && profileObject.email_verified) {
-    //         setPopup("User exists and logged in with Google.")
-    //       }
-    //   })
-    // }
   };
 
+  // Google OATH => Error Response
   const handleErrorResponse = () => {
       console.log('error on auth');
   };
 
+
+  // Backend calls to check validity of the account
   const checkAccount = async (email_user: string, password_user?: string, credential?: string) => {
-    console.log(credential)
-    if (credential)
-      return canLogIn({ variables: { email: email_user ?? undefined, password: password_user ?? undefined, google_auth: credential ?? undefined}})
+    const fields = { email: email_user ?? "", password: password_user ?? "", google_auth: credential ?? ""}
+    return canLogIn({ variables: fields})
   }
 
-
+  // Form Submit action
   const onFormSubmit = async (values: any) => {
-    console.log(values)
     const accountExists = await checkAccount(values.email, values.password, values.credential)
-    console.log(accountExists)
 
-    if (accountExists && accountExists.data && accountExists.data.canLogIn) 
-      setPopup("Proceed.")
+    if (accountExists && accountExists.data && accountExists.data.canLogIn) {
+      setCookie('user', {email: values.email, session_token: values.credential})
+      setLocation("/home");
+    }
     else if (!accountExists)
       setPopup("Server is down.")
     else
@@ -108,7 +87,7 @@ function LogIn(): ReactElement {
           enableReinitialize
           validationSchema={LogInSchema}
           initialValues={{
-            email: profile ? profile.email : '',
+            email: '',
             password: '',
           }}
           onSubmit={async (values) => {
