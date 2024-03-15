@@ -44,3 +44,25 @@ export const CAN_LOGIN = gql`
       )
     }
 `
+
+export const ENCODE_TOKEN = gql`
+  query 
+    encodeToken(
+      $token: String!
+    ) {
+      encodeToken(
+        session_token: $token
+      )
+    }
+`
+
+export const DECODE_TOKEN = gql`
+  query 
+    decodeToken(
+      $token: String!
+    ) {
+      decodeToken(
+        session_token: $token
+      )
+    }
+`

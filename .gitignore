@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 /src/credentials/*
+/src/server/schema/Queries/Secrets.ts

@@ -1,12 +1,12 @@
-import { ReactElement, useEffect, useRef, useState } from 'react'
-import { GET_ALL_ACCOUNTS, ACCOUNT_EXISTS, MAIL_EXISTS, CAN_LOGIN } from '../GraphQL/Queries'
-import { gql, useLazyQuery, useQuery } from '@apollo/client'
+import { ReactElement, useState } from 'react'
+import { CAN_LOGIN, DECODE_TOKEN, ENCODE_TOKEN } from '../GraphQL/Queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
 import { Field, Form, Formik } from 'formik'
 import { GoogleCredentialResponse, GoogleLogin } from '@react-oauth/google'
 
 import { JwtPayload, jwtDecode } from 'jwt-decode'
 import { object, string } from 'yup'
-import { Link, useLocation, useRoute } from 'wouter'
+import { Link, useLocation } from 'wouter'
 
 import Logo from './Logo'
 import { useCookies } from 'react-cookie'
@@ -23,6 +23,18 @@ function LogIn(): ReactElement {
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const [location, setLocation] = useLocation();
   
+  //@ts-ignore
+  const [encodeToken, {loadingE, errorE, dataE}] = useLazyQuery(
+    ENCODE_TOKEN, 
+    { variables: { token: '' }}
+  )
+
+  //@ts-ignore
+  const [decodeToken, {loadingD, errorD, dataD}] = useLazyQuery(
+    DECODE_TOKEN, 
+    { variables: { token: '' }}
+  )
+
   //@ts-ignore
   const [canLogIn, {loading, error, data}] = useLazyQuery(
     CAN_LOGIN, 
@@ -55,7 +67,11 @@ function LogIn(): ReactElement {
     const accountExists = await checkAccount(values.email, values.password, values.credential)
 
     if (accountExists && accountExists.data && accountExists.data.canLogIn) {
-      setCookie('user', {email: values.email, session_token: values.credential})
+      
+      const encoded_token = await encodeToken({ variables: { token: values.credential }}) //157s.4.303t.2
+
+
+      setCookie('user', {email: values.email, session_token: encoded_token.data.encodeToken})
       setLocation("/home");
     }
     else if (!accountExists)
